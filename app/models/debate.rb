@@ -46,7 +46,7 @@ class Debate < ActiveRecord::Base
   scope :public_for_api,           -> { all }
 
   # Ahoy setup
-  visitable # Ahoy will automatically assign visit_id on create
+  visitable class_name: "Debate" # Ahoy will automatically assign visit_id on create
 
   attr_accessor :link_required
 
