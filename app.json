@@ -1,0 +1,82 @@
+{
+  "name": "CONSUL",
+  "description": "A simple CONSUL demo on Heroku",
+  "keywords": [
+    "ruby",
+    "agplv3",
+    "consul",
+    "e-government",
+    "democracy",
+    "rails",
+    "open-government"
+  ],
+  "website": "http://consulproject.org/en/",
+  "repository": "https://github.com/consul/consul",
+  "logo": "http://consulproject.org/img/consul_logo.svg",
+  "success_url": "/",
+  "scripts": {
+    "postdeploy": "bundle exec rake db:setup"
+  },
+  "env": {
+    "RAILS_ENV": {
+      "description": "The environment in which the app will be running (production is default).",
+      "required": true,
+      "value": "production"
+    },
+    "SEED": {
+      "description": "Yes if wanting to seed test data",
+      "required": false,
+      "value": "yes"
+    },
+    "SECRET_KEY_BASE": {
+      "description": "A secret key for verifying the integrity of signed cookies.",
+      "generator": "secret"
+    },
+    "WEB_CONCURRENCY": {
+      "description": "The number of processes to run.",
+      "required": false,
+      "value": "1"
+    },
+    "MAX_THREADS": {
+      "description": "The maximum amount of threads worker will spawn.",
+      "required": false,
+      "value": "2"
+    },
+    "AWS_ACCESS_KEY_ID": {
+      "description": "S3 ID. Required to upload images or docs.",
+      "required": false
+    },
+    "AWS_SECRET_ACCESS_KEY": {
+      "description": "S3 secret key. Required to upload images or docs.",
+      "required": false
+    },
+    "AWS_S3_HOST_NAME": {
+      "description": "S3 host name. Required to upload images or docs.",
+      "required": false
+    },
+    "AWS_S3_REGION": {
+      "description": "S3 region. Required to upload images or docs.",
+      "required": false
+    },
+    "AWS_S3_BUCKET": {
+      "description": "S3 bucket name. Required to upload images or docs.",
+      "required": false
+    }
+  },
+  "formation": {
+    "web": {
+      "quantity": 1
+    }
+  },
+  "image": "heroku/ruby",
+  "addons": [
+    "rollbar:free",
+    "heroku-postgresql",
+    "mailgun:starter"
+  ],
+  "buildpacks": [
+    {
+      "url": "https://github.com/heroku/heroku-buildpack-ruby"
+    }
+  ]
+}
