@@ -21,7 +21,7 @@ App.WatchFormChanges =
     if App.WatchFormChanges.forms().length == 0 || App.WatchFormChanges.msg() == undefined
       return
 
-    $(document).off("page:before-change").on("page:before-change", (e) -> App.WatchFormChanges.checkChanges(e))
+    $(document).off("turbolinks:click").on("turbolinks:click", (e) -> App.WatchFormChanges.checkChanges(e))
 
     App.WatchFormChanges.forms().each ->
       form = $(this)

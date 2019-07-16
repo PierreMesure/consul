@@ -7,7 +7,7 @@ App.FoundationExtras =
     clearSticky = ->
       $("[data-sticky]").foundation("destroy") if $("[data-sticky]").length
 
-    $(document).on("page:before-unload", clearSticky)
+    $(document).on("turbolinks:before-cache", clearSticky)
 
     window.addEventListener("popstate", clearSticky, false)
 
