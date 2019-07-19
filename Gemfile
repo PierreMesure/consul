@@ -6,7 +6,7 @@ gem "acts-as-taggable-on", "~> 5.0.0"
 gem "acts_as_votable", "~> 0.11.1"
 gem "ahoy_matey", "~> 1.6.0"
 gem "ancestry", "~> 3.0.2"
-gem "autoprefixer-rails", "~> 8.2.0"
+gem "autoprefixer-rails", "~> 9.6.1"
 gem "browser", "~> 2.5.3"
 gem "cancancan", "~> 2.3.0"
 gem "ckeditor", "~> 4.2.3"
@@ -44,7 +44,7 @@ gem "redcarpet", "~> 3.4.0"
 gem "responders", "~> 2.4.0"
 gem "rinku", "~> 2.0.2", require: "rails_rinku"
 gem "rollbar", "~> 2.18.0"
-gem "sass-rails", "~> 5.0", ">= 5.0.4"
+gem "sassc-rails", "~> 2.1.2"
 gem "savon", "~> 2.12.0"
 gem "sitemap_generator", "~> 6.0.1"
 gem "social-share-button", "~> 1.1"
@@ -84,8 +84,8 @@ group :test do
   gem "coveralls", "~> 0.8.22", require: false
   gem "database_cleaner", "~> 1.7.0"
   gem "email_spec", "~> 2.1.0"
-  gem "rspec-rails", "~> 3.8"
-  gem "selenium-webdriver", "~> 3.141"
+  gem "rspec-rails", "~> 3.8.2"
+  gem "selenium-webdriver", "~> 3.142.3"
 end
 
 group :development do
