@@ -1,8 +1,8 @@
 require "rails_helper"
 
-feature "Admin download settings" do
+describe "Admin download settings" do
 
-  background do
+  before do
     admin = create(:administrator)
     login_as(admin.user)
   end
@@ -31,7 +31,7 @@ feature "Admin download settings" do
 
   context "Download debates" do
 
-    background do
+    before do
       create(:debate)
     end
 
@@ -84,7 +84,7 @@ feature "Admin download settings" do
 
   context "Download proposals" do
 
-    background do
+    before do
       create(:proposal)
     end
 
@@ -177,7 +177,7 @@ feature "Admin download settings" do
 
   context "Download legislation process" do
 
-    background do
+    before do
       create(:legislation_process, :open)
       create(:legislation_process, :published)
     end
@@ -284,9 +284,9 @@ feature "Admin download settings" do
                                heading: heading,
                                price: 600,
                                ballot_lines_count: 600) }
-    let(:budget) {create :budget}
+    let(:budget) { create :budget }
 
-    background do
+    before do
       Budget::Result.new(budget_finished, heading).calculate_winners
     end
 

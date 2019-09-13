@@ -8,7 +8,7 @@ describe UserSegments do
   describe "#all_users" do
     it "returns all active users enabled" do
       active_user = create(:user)
-      erased_user  = create(:user, erased_at: Time.current)
+      erased_user = create(:user, erased_at: Time.current)
 
       expect(described_class.all_users).to include active_user
       expect(described_class.all_users).not_to include erased_user
@@ -31,7 +31,7 @@ describe UserSegments do
     it "returns users that have created a proposal even if is archived or retired" do
       create(:proposal, author: user1)
       create(:proposal, :archived, author: user2)
-      create(:proposal, retired_at: Time.current, author: user3)
+      create(:proposal, :retired, author: user3)
 
       all_proposal_authors = described_class.all_proposal_authors
       expect(all_proposal_authors).to include user1
@@ -42,7 +42,7 @@ describe UserSegments do
     it "does not return duplicated users" do
       create(:proposal, author: user1)
       create(:proposal, :archived, author: user1)
-      create(:proposal, retired_at: Time.current, author: user1)
+      create(:proposal, :retired, author: user1)
 
       all_proposal_authors = described_class.all_proposal_authors
       expect(all_proposal_authors).to contain_exactly(user1)

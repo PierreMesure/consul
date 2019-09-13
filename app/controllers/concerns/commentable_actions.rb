@@ -3,6 +3,7 @@ module CommentableActions
   include Polymorphic
   include Search
   include DownloadSettingsHelper
+  include RemotelyTranslatable
 
   def index
     @resources = resource_model.all
@@ -15,7 +16,7 @@ module CommentableActions
 
     @resources = @resources.page(params[:page]).send("sort_by_#{@current_order}")
 
-    index_customization if index_customization.present?
+    index_customization
 
     @tag_cloud = tag_cloud
     @banners = Banner.in_section(section(resource_model.name)).with_active
@@ -23,9 +24,11 @@ module CommentableActions
     set_resource_votes(@resources)
 
     set_resources_instance
+    @remote_translations = detect_remote_translations(@resources, featured_proposals)
+
     respond_to do |format|
       format.html
-      format.csv {send_data to_csv(resources_csv, resource_model),
+      format.csv { send_data to_csv(resources_csv, resource_model),
                             type: "text/csv",
                             disposition: "attachment",
                             filename: "#{get_resource(resource_model)}.csv" }
@@ -38,6 +41,7 @@ module CommentableActions
     @comment_tree = CommentTree.new(@commentable, params[:page], @current_order)
     set_comment_flags(@comment_tree.comments)
     set_resource_instance
+    @remote_translations = detect_remote_translations([@resource], @comment_tree.comments)
   end
 
   def new
@@ -132,4 +136,7 @@ module CommentableActions
       end
     end
 
+    def featured_proposals
+      @featured_proposals ||= []
+    end
 end

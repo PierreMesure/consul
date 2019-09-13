@@ -1,6 +1,7 @@
 require "application_responder"
 
 class ApplicationController < ActionController::Base
+  include GlobalizeFallbacks
   include HasFilters
   include HasOrders
   include AccessDeniedHandler
@@ -14,7 +15,6 @@ class ApplicationController < ActionController::Base
   before_action :track_email_campaign
   before_action :set_return_url
   before_action :set_current_user
-  before_action :set_fallbacks_to_all_available_locales
 
   check_authorization unless: :devise_controller?
   self.responder = ApplicationResponder
@@ -110,9 +110,9 @@ class ApplicationController < ActionController::Base
     end
 
     def set_default_budget_filter
-      if @budget.try(:balloting?) || @budget.try(:publishing_prices?)
+      if @budget&.balloting? || @budget&.publishing_prices?
         params[:filter] ||= "selected"
-      elsif @budget.try(:finished?)
+      elsif @budget&.finished?
         params[:filter] ||= "winners"
       end
     end
@@ -123,9 +123,5 @@ class ApplicationController < ActionController::Base
 
     def set_current_user
       User.current_user = current_user
-    end
-
-    def set_fallbacks_to_all_available_locales
-      Globalize.set_fallbacks_to_all_available_locales
     end
 end

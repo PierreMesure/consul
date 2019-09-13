@@ -1,19 +1,19 @@
 require "rails_helper"
 
-feature "Valuation budget investments" do
+describe "Valuation budget investments" do
 
   let(:budget) { create(:budget) }
   let(:tracker) do
     create(:tracker, user: create(:user, username: "Rachel", email: "rachel@trackers.org"))
   end
 
-  background do
+  before do
     login_as(tracker.user)
   end
 
   scenario "Disabled with a feature flag" do
     Setting["process.budgets"] = nil
-    expect{
+    expect {
       visit tracking_budget_budget_investments_path(create(:budget))
     }.to raise_exception(FeatureFlags::FeatureDisabled)
   end
@@ -23,7 +23,7 @@ feature "Valuation budget investments" do
     expect(page).to have_link "Tracking", href: tracking_root_path
   end
 
-  feature "Index" do
+  describe "Index" do
     scenario "Index shows budget investments assigned to current tracker" do
       investment1 = create(:budget_investment, budget: budget)
       investment2 = create(:budget_investment, budget: budget)
@@ -108,7 +108,7 @@ feature "Valuation budget investments" do
     end
   end
 
-  feature "Show" do
+  describe "Show" do
     let(:administrator) do
       create(:administrator, user: create(:user, username: "Ana", email: "ana@admins.org"))
     end
@@ -119,7 +119,7 @@ feature "Valuation budget investments" do
       create(:budget_investment, budget: budget, administrator: administrator)
     end
 
-    background do
+    before do
       investment.trackers << [tracker, second_tracker]
     end
 
@@ -161,14 +161,14 @@ feature "Valuation budget investments" do
       logout
       login_as create(:tracker).user
 
-      expect{
+      expect {
         visit tracking_budget_budget_investment_path(budget, investment)
       }.to raise_error "Not Found"
     end
 
   end
 
-  feature "Milestones" do
+  describe "Milestones" do
     let(:admin) { create(:administrator) }
     let(:investment) do
       heading = create(:budget_heading)
@@ -176,7 +176,7 @@ feature "Valuation budget investments" do
                                  administrator: admin)
     end
 
-    background do
+    before do
       investment.trackers << tracker
     end
 
@@ -200,7 +200,7 @@ feature "Valuation budget investments" do
 
       expect(page).to have_content("Create milestone")
       fill_in("Description", with: "Test Description")
-      page.find("#milestone_publication_date").set(Date.today)
+      page.find("#milestone_publication_date").set(Date.current)
 
       click_button "Create milestone"
 
@@ -250,7 +250,7 @@ feature "Valuation budget investments" do
 
   end
 
-  feature "Progress Bars" do
+  describe "Progress Bars" do
 
     let(:admin) { create(:administrator) }
     let(:investment) do
@@ -259,7 +259,7 @@ feature "Valuation budget investments" do
              administrator: admin)
     end
 
-    background do
+    before do
       investment.trackers << tracker
     end
 
@@ -273,7 +273,7 @@ feature "Valuation budget investments" do
       logout
       login_as create(:tracker, user: create(:user)).user
 
-      expect{
+      expect {
         visit tracking_budget_budget_investment_progress_bars_path(budget, investment)
       }.to raise_error "Not Found"
     end

@@ -7,7 +7,7 @@ describe "Admin budgets" do
     login_as(admin.user)
   end
 
-  it_behaves_like "translatable",
+  it_behaves_like "edit_translatable",
                   "budget",
                   "edit_admin_budget_path",
                   %w[name]
@@ -19,7 +19,7 @@ describe "Admin budgets" do
     end
 
     scenario "Disabled with a feature flag" do
-      expect{ visit admin_budgets_path }.to raise_exception(FeatureFlags::FeatureDisabled)
+      expect { visit admin_budgets_path }.to raise_exception(FeatureFlags::FeatureDisabled)
     end
 
   end
@@ -93,7 +93,7 @@ describe "Admin budgets" do
     end
 
     scenario "Open filter is properly highlighted" do
-      filters_links = {"current" => "Open", "finished" => "Finished"}
+      filters_links = { "current" => "Open", "finished" => "Finished" }
 
       visit admin_budgets_path
 
@@ -227,7 +227,7 @@ describe "Admin budgets" do
 
       visit edit_admin_budget_path(budget)
 
-      select "Español", from: "translation_locale"
+      select "Español", from: :add_language
       fill_in "Name", with: "Spanish name"
       click_button "Update Budget"
 
@@ -236,7 +236,7 @@ describe "Admin budgets" do
 
       visit edit_admin_budget_path(budget)
 
-      click_link "English"
+      select "English", from: :select_language
       fill_in "Name", with: "New English Name"
       click_button "Update Budget"
 
@@ -285,7 +285,6 @@ describe "Admin budgets" do
       expect(page).to have_content winner.title
       expect(page).not_to have_content unselected.title
       expect(page).not_to have_content selected.title
-
 
       visit edit_admin_budget_path(budget)
       expect(page).to have_content "See results"

@@ -11,6 +11,12 @@ describe "Admin budget investments" do
                   :budget_investment,
                   "admin_budget_budget_investment_path"
 
+  it_behaves_like "edit_translatable",
+                  :budget_investment,
+                  "edit_admin_budget_budget_investment_path",
+                  %w[title],
+                  { "description" => :ckeditor }
+
   before do
     @admin = create(:administrator)
     login_as(@admin.user)
@@ -27,7 +33,7 @@ describe "Admin budget investments" do
     end
 
     scenario "Disabled with a feature flag" do
-      expect{ visit admin_budgets_path }.to raise_exception(FeatureFlags::FeatureDisabled)
+      expect { visit admin_budgets_path }.to raise_exception(FeatureFlags::FeatureDisabled)
     end
 
   end
@@ -497,7 +503,7 @@ describe "Admin budget investments" do
       valuating.valuators.push(create(:valuator))
       valuated.valuators.push(create(:valuator))
 
-      query_params = {budget_id: budget.id, advanced_filters: ["under_valuation"]}
+      query_params = { budget_id: budget.id, advanced_filters: ["under_valuation"] }
 
       visit admin_budget_budget_investments_path(query_params)
 
@@ -681,7 +687,6 @@ describe "Admin budget investments" do
                                  administrator: administrator)
       create(:budget_investment, budget: budget, title: "More hospitals")
 
-
       visit admin_budget_budget_investments_path(budget_id: budget.id)
 
       expect(page).to have_css(".budget_investment", count: 3)
@@ -761,7 +766,6 @@ describe "Admin budget investments" do
                                  administrator: administrator)
       create(:budget_investment, budget: budget, title: "More hostals")
 
-
       visit admin_budget_budget_investments_path(budget_id: budget.id)
 
       expect(page).to have_css(".budget_investment", count: 4)
@@ -826,33 +830,43 @@ describe "Admin budget investments" do
     end
 
     before do
-      create(:budget_investment, title: "Some investment", budget: budget)
+      I18n.with_locale(:es) do
+        Globalize.with_locale(:es) do
+          create(:budget_investment, title: "Proyecto de inversión", budget: budget)
+        end
+      end
     end
 
     scenario "Search investments by title" do
       visit admin_budget_budget_investments_path(budget)
 
-      expect(page).to have_content("Some investment")
+      expect(page).to have_content("Proyecto de inversión")
       expect(page).to have_content("Some other investment")
 
-      fill_in "title_or_id", with: "Some investment"
+      fill_in "title_or_id", with: "Proyecto de inversión"
       click_button "Filter"
 
-      expect(page).to have_content("Some investment")
+      expect(page).to have_content("Proyecto de inversión")
       expect(page).not_to have_content("Some other investment")
+
+      fill_in "title_or_id", with: "Some other investment"
+      click_button "Filter"
+
+      expect(page).not_to have_content("Proyecto de inversión")
+      expect(page).to have_content("Some other investment")
     end
 
     scenario "Search investments by ID" do
       visit admin_budget_budget_investments_path(budget)
 
-      expect(page).to have_content("Some investment")
+      expect(page).to have_content("Proyecto de inversión")
       expect(page).to have_content("Some other investment")
 
       fill_in "title_or_id", with: first_investment.id
       click_button "Filter"
 
       expect(page).to have_content("Some other investment")
-      expect(page).not_to have_content("Some investment")
+      expect(page).not_to have_content("Proyecto de inversión")
     end
   end
 
@@ -1092,8 +1106,8 @@ describe "Admin budget investments" do
       visit admin_budget_budget_investment_path(budget_investment.budget, budget_investment)
       click_link "Edit"
 
-      fill_in "budget_investment_title", with: "Potatoes"
-      fill_in "budget_investment_description", with: "Carrots"
+      fill_in "Title", with: "Potatoes"
+      fill_in "Description", with: "Carrots"
       select "#{budget_investment.group.name}: Barbate", from: "budget_investment[heading_id]"
       uncheck "budget_investment_incompatible"
       check "budget_investment_selected"
@@ -1355,7 +1369,7 @@ describe "Admin budget investments" do
       visit admin_budget_budget_investment_path(budget_investment.budget, budget_investment)
       click_link "Edit"
 
-      fill_in "budget_investment_title", with: ""
+      fill_in "Title", with: ""
 
       click_button "Update"
 
@@ -1571,6 +1585,8 @@ describe "Admin budget investments" do
 
         within("#budget_investment_#{selected_bi.id}") do
           click_link("Selected")
+
+          expect(page).to have_link "Select"
         end
 
         click_link("Next")
@@ -1808,7 +1824,7 @@ describe "Admin budget investments" do
       visit admin_budget_budget_investments_path(budget)
 
       cookies = page.driver.browser.manage.all_cookies
-      cookie = cookies.find{|cookie| cookie[:name] == "investments-columns"}
+      cookie = cookies.find { |cookie| cookie[:name] == "investments-columns" }
       cookie_value = cookie[:value]
 
       expect(cookie_value).to eq("id,title,supports,admin,valuator,geozone," +
@@ -1862,22 +1878,36 @@ describe "Admin budget investments" do
       end
 
       cookies = page.driver.browser.manage.all_cookies
-      cookie = cookies.find{|cookie| cookie[:name] == "investments-columns"}
+      cookie = cookies.find { |cookie| cookie[:name] == "investments-columns" }
       cookie_value = cookie[:value]
 
       expect(cookie_value).to eq("id,supports,admin,geozone," +
         "feasibility,valuation_finished,visible_to_valuators,selected,incompatible,author")
 
-
       visit admin_budget_budget_investments_path(budget)
 
       cookies = page.driver.browser.manage.all_cookies
-      cookie = cookies.find{|cookie| cookie[:name] == "investments-columns"}
+      cookie = cookies.find { |cookie| cookie[:name] == "investments-columns" }
       cookie_value = cookie[:value]
 
       expect(cookie_value).to eq("id,supports,admin,geozone,feasibility,valuation_finished," +
         "visible_to_valuators,selected,incompatible,author")
 
+    end
+
+    scenario "Select an investment when some columns are not displayed", :js do
+      investment.update_attribute(:title, "Don't display me, please!")
+
+      visit admin_budget_budget_investments_path(budget)
+      within("#js-columns-selector") { find("strong", text: "Columns").click }
+      within("#js-columns-selector-wrapper") { uncheck "Title" }
+
+      within("#budget_investment_#{investment.id}") do
+        click_link "Selected"
+
+        expect(page).to have_link "Select"
+        expect(page).not_to have_content "Don't display me, please!"
+      end
     end
   end
 

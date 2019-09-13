@@ -6,6 +6,7 @@ describe Poll do
 
   describe "Concerns" do
     it_behaves_like "notifiable"
+    it_behaves_like "acts as paranoid", :poll
     it_behaves_like "reportable"
   end
 
@@ -138,7 +139,7 @@ describe Poll do
   end
 
   describe "answerable_by" do
-    let(:geozone) {create(:geozone) }
+    let(:geozone) { create(:geozone) }
 
     let!(:current_poll) { create(:poll) }
     let!(:expired_poll) { create(:poll, :expired) }
@@ -411,6 +412,32 @@ describe Poll do
         expect(Poll.sort_for_list.count).to eq 4
         expect(Poll.sort_for_list).to eq [poll4, poll1, poll2, poll3]
       end
+    end
+  end
+
+  describe "#recounts_confirmed" do
+    it "is false for current polls" do
+      poll = create(:poll, :current)
+
+      expect(poll.recounts_confirmed?).to be false
+    end
+
+    it "is false for recounting polls" do
+      poll = create(:poll, :recounting)
+
+      expect(poll.recounts_confirmed?).to be false
+    end
+
+    it "is false for polls which finished less than a month ago" do
+      poll = create(:poll, starts_at: 3.months.ago, ends_at: 27.days.ago)
+
+      expect(poll.recounts_confirmed?).to be false
+    end
+
+    it "is true for polls which finished more than a month ago" do
+      poll = create(:poll, starts_at: 3.months.ago, ends_at: 1.month.ago - 1.day)
+
+      expect(poll.recounts_confirmed?).to be true
     end
   end
 end

@@ -1,14 +1,14 @@
 require "rails_helper"
 
-feature "Admin change log" do
-  let(:budget) {create(:budget)}
+describe "Admin change log" do
+  let(:budget) { create(:budget) }
   let(:administrator) do
     create(:administrator, user: create(:user, username: "Ana", email: "ana@admins.org"))
   end
 
   context "Investments Participatory Budgets" do
 
-    background do
+    before do
       @admin = create(:administrator)
       login_as(@admin.user)
     end
